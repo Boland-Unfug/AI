@@ -86,12 +86,86 @@ def depthFirstSearch(problem: SearchProblem):
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    
+    successors = problem.getSuccessors(state)
+    # for loop counting successors
+    # pass back previous node instead of all nodes
+    #     if((successors[0][0] not in visited and (depth < maxdepth))):
+    #         depth += 1
+    #         visited.append(successors[0][0])
+    #         path.append(successors[0])
+    #         frontier.push(path) #add successors to frontier
+            
+    #     elif((successors[1][0] not in visited and (depth < maxdepth))):
+    #         depth += 1
+    #         visited.append(successors[1][0])
+    #         path.append(successors[1])
+    #         frontier.push(path) #add successors to frontier
+    #     else:
+    #         depth -= 1
+    #         frontier.pop()
+            
+    #     #print("Visited:", visited)
+    #     #print("path:", path)
+    #     print("Frontier", frontier.list)
+    #     frontierend = frontier.list[len(frontier.list)-1]
+    #     #print("Frontier end:",frontierend)
+    #     state = frontierend[len(path)-1][0]
+    # answer = []
+    # for j in range(len(path)):
+    #     answer.append(path[j][1])
+    # return answer
+
+    frontier = util.Stack()
+    visited = []
+    path = []
+    depth = 0
+    maxdepth = 10 #this needs to be dynamic TODO
+    state = problem.getStartState() # only returns the position, need more info
+    test = 0
+    while(frontier.isEmpty() == False and (test < 3)): #while there are things to check
+        test += 1
+    
+    
 
 def breadthFirstSearch(problem: SearchProblem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
+    # check first item in queue
+    # get its successors
+    # append successors to frontier
+    # get successors to expand options
+    # check paths, no need for max depth or visited?
+    # figure out pathing after
+
+    frontier = util.Queue()
+    searched = []
+    path = []
+    state = problem.getStartState() # only returns the position, need more info
+    start_successors = problem.getSuccessors(state)
+    for successor in  successors:
+        frontier.push(successor)
+    test = 0
+    while(test < 2): #while the goal has not been reached problem.isGoalState(state) != True
+        # lets try something
+        # I need to hand it paths
+        print("Frontier:", frontier.list)
+        state = frontier.list[0]
+        print("Current State:", state)
+        successors = problem.getSuccessors(state[0])
+        print("Successors:", successors)
+        for i in successors:
+            print([j for j in i])
+            successor = [j for j in i]
+            frontier.push(successor)
+        print("Frontier:", frontier.list)
+        # searched.append(frontier.list[len(frontier.list)-1])
+        # frontier.pop()
+        # #print("Searched:", searched)
+        # #print("New Frontier:", frontier.list)
+        s
+        
+        test += 1
     util.raiseNotDefined()
 
 def uniformCostSearch(problem: SearchProblem):
