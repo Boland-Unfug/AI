@@ -10,6 +10,7 @@ import nn
 
 use_graphics = True
 
+
 def maybe_sleep_and_close(seconds):
     if use_graphics and plt.get_fignums():
         time.sleep(seconds)
@@ -22,18 +23,17 @@ def maybe_sleep_and_close(seconds):
             except:
                 pass
 
+
 def get_data_path(filename):
-    path = os.path.join(
-        os.path.dirname(__file__), os.pardir, "data", filename)
+    path = os.path.join(os.path.dirname(__file__), os.pardir, "data", filename)
     if not os.path.exists(path):
-        path = os.path.join(
-            os.path.dirname(__file__), "data", filename)
+        path = os.path.join(os.path.dirname(__file__), "data", filename)
     if not os.path.exists(path):
-        path = os.path.join(
-            os.path.dirname(__file__), filename)
+        path = os.path.join(os.path.dirname(__file__), filename)
     if not os.path.exists(path):
         raise Exception("Could not find data file: {}".format(filename))
     return path
+
 
 class Dataset(object):
     def __init__(self, x, y):
@@ -48,16 +48,18 @@ class Dataset(object):
         self.y = y
 
     def iterate_once(self, batch_size):
-        assert isinstance(batch_size, int) and batch_size > 0, (
-            "Batch size should be a positive integer, got {!r}".format(
-                batch_size))
-        assert self.x.shape[0] % batch_size == 0, (
-            "Dataset size {:d} is not divisible by batch size {:d}".format(
-                self.x.shape[0], batch_size))
+        assert (
+            isinstance(batch_size, int) and batch_size > 0
+        ), "Batch size should be a positive integer, got {!r}".format(batch_size)
+        assert (
+            self.x.shape[0] % batch_size == 0
+        ), "Dataset size {:d} is not divisible by batch size {:d}".format(
+            self.x.shape[0], batch_size
+        )
         index = 0
         while index < self.x.shape[0]:
-            x = self.x[index:index + batch_size]
-            y = self.y[index:index + batch_size]
+            x = self.x[index : index + batch_size]
+            y = self.y[index : index + batch_size]
             yield nn.Constant(x), nn.Constant(y)
             index += batch_size
 
@@ -69,7 +71,9 @@ class Dataset(object):
         raise NotImplementedError(
             "No validation data is available for this dataset. "
             "In this assignment, only the Digit Classification and Language "
-            "Identification datasets have validation data.")
+            "Identification datasets have validation data."
+        )
+
 
 class PerceptronDataset(Dataset):
     def __init__(self, model):
@@ -88,7 +92,7 @@ class PerceptronDataset(Dataset):
             ax.set_ylim(limits)
             positive = ax.scatter(*x[y == 1, :-1].T, color="red", marker="+")
             negative = ax.scatter(*x[y == -1, :-1].T, color="blue", marker="_")
-            line, = ax.plot([], [], color="black")
+            (line,) = ax.plot([], [], color="black")
             text = ax.text(0.03, 0.97, "", transform=ax.transAxes, va="top")
             ax.legend([positive, negative], [1, -1])
             plt.show(block=False)
@@ -116,10 +120,13 @@ class PerceptronDataset(Dataset):
                     self.line.set_data([], [])
                 self.text.set_text(
                     "epoch: {:,}\npoint: {:,}/{:,}\nweights: {}".format(
-                        self.epoch, i * batch_size + 1, len(self.x), w))
+                        self.epoch, i * batch_size + 1, len(self.x), w
+                    )
+                )
                 self.fig.canvas.draw_idle()
                 self.fig.canvas.start_event_loop(1e-3)
                 self.last_update = time.time()
+
 
 class RegressionDataset(Dataset):
     def __init__(self, model):
@@ -136,8 +143,8 @@ class RegressionDataset(Dataset):
             fig, ax = plt.subplots(1, 1)
             ax.set_xlim(-2 * np.pi, 2 * np.pi)
             ax.set_ylim(-1.4, 1.4)
-            real, = ax.plot(x[self.argsort_x], y[self.argsort_x], color="blue")
-            learned, = ax.plot([], [], color="red")
+            (real,) = ax.plot(x[self.argsort_x], y[self.argsort_x], color="blue")
+            (learned,) = ax.plot([], [], color="red")
             text = ax.text(0.03, 0.97, "", transform=ax.transAxes, va="top")
             ax.legend([real, learned], ["real", "learned"])
             plt.show(block=False)
@@ -155,13 +162,16 @@ class RegressionDataset(Dataset):
             if use_graphics and time.time() - self.last_update > 0.1:
                 predicted = self.model.run(nn.Constant(self.x)).data
                 loss = self.model.get_loss(
-                    nn.Constant(self.x), nn.Constant(self.y)).data
+                    nn.Constant(self.x), nn.Constant(self.y)
+                ).data
                 self.learned.set_data(self.x[self.argsort_x], predicted[self.argsort_x])
-                self.text.set_text("processed: {:,}\nloss: {:.6f}".format(
-                   self.processed, loss))
+                self.text.set_text(
+                    "processed: {:,}\nloss: {:.6f}".format(self.processed, loss)
+                )
                 self.fig.canvas.draw_idle()
                 self.fig.canvas.start_event_loop(1e-3)
                 self.last_update = time.time()
+
 
 class DigitClassificationDataset(Dataset):
     def __init__(self, model):
@@ -195,28 +205,30 @@ class DigitClassificationDataset(Dataset):
             images = collections.defaultdict(list)
             texts = collections.defaultdict(list)
             for i in reversed(range(10)):
-                ax[i] = plt.subplot2grid((30, 1), (3 * i, 0), 2, 1,
-                                         sharex=ax.get(9))
+                ax[i] = plt.subplot2grid((30, 1), (3 * i, 0), 2, 1, sharex=ax.get(9))
                 plt.setp(ax[i].get_xticklabels(), visible=i == 9)
                 ax[i].set_yticks([])
-                ax[i].text(-0.03, 0.5, i, transform=ax[i].transAxes,
-                           va="center")
+                ax[i].text(-0.03, 0.5, i, transform=ax[i].transAxes, va="center")
                 ax[i].set_xlim(0, 28 * width)
                 ax[i].set_ylim(0, 28)
                 for j in range(samples):
-                    images[i].append(ax[i].imshow(
-                        np.zeros((28, 28)), vmin=0, vmax=1, cmap="Greens",
-                        alpha=0.3))
-                    texts[i].append(ax[i].text(
-                        0, 0, "", ha="center", va="top", fontsize="smaller"))
+                    images[i].append(
+                        ax[i].imshow(
+                            np.zeros((28, 28)), vmin=0, vmax=1, cmap="Greens", alpha=0.3
+                        )
+                    )
+                    texts[i].append(
+                        ax[i].text(0, 0, "", ha="center", va="top", fontsize="smaller")
+                    )
             ax[9].set_xticks(np.linspace(0, 28 * width, 11))
             ax[9].set_xticklabels(
-                ["{:.1f}".format(num) for num in np.linspace(0, 1, 11)])
+                ["{:.1f}".format(num) for num in np.linspace(0, 1, 11)]
+            )
             ax[9].tick_params(axis="x", pad=16)
             ax[9].set_xlabel("Probability of Correct Label")
             status = ax[0].text(
-                0.5, 1.5, "", transform=ax[0].transAxes, ha="center",
-                va="bottom")
+                0.5, 1.5, "", transform=ax[0].transAxes, ha="center", va="bottom"
+            )
             plt.show(block=False)
 
             self.width = width
@@ -242,16 +254,20 @@ class DigitClassificationDataset(Dataset):
                 self.status.set_text(
                     "epoch: {:d}, batch: {:d}/{:d}, validation accuracy: "
                     "{:.2%}".format(
-                        self.epoch, i, len(self.x) // batch_size, dev_accuracy))
+                        self.epoch, i, len(self.x) // batch_size, dev_accuracy
+                    )
+                )
                 for i in range(10):
                     predicted = dev_predicted[self.dev_labels == i]
                     probs = dev_probs[self.dev_labels == i][:, i]
-                    linspace = np.linspace(
-                        0, len(probs) - 1, self.samples).astype(int)
+                    linspace = np.linspace(0, len(probs) - 1, self.samples).astype(int)
                     indices = probs.argsort()[linspace]
-                    for j, (prob, image) in enumerate(zip(
+                    for j, (prob, image) in enumerate(
+                        zip(
                             probs[indices],
-                            self.dev_images[self.dev_labels == i][indices])):
+                            self.dev_images[self.dev_labels == i][indices],
+                        )
+                    ):
                         self.images[i][j].set_data(image.reshape((28, 28)))
                         left = prob * (self.width - 1) * 28
                         if predicted[indices[j]] == i:
@@ -272,6 +288,7 @@ class DigitClassificationDataset(Dataset):
         dev_accuracy = np.mean(dev_predicted == self.dev_labels)
         return dev_accuracy
 
+
 class LanguageIDDataset(Dataset):
     def __init__(self, model):
         self.model = model
@@ -279,35 +296,37 @@ class LanguageIDDataset(Dataset):
         data_path = get_data_path("lang_id.npz")
 
         with np.load(data_path) as data:
-            self.chars = data['chars']
-            self.language_codes = data['language_codes']
-            self.language_names = data['language_names']
+            self.chars = data["chars"]
+            self.language_codes = data["language_codes"]
+            self.language_names = data["language_names"]
 
-            self.train_x = data['train_x']
-            self.train_y = data['train_y']
-            self.train_buckets = data['train_buckets']
-            self.dev_x = data['dev_x']
-            self.dev_y = data['dev_y']
-            self.dev_buckets = data['dev_buckets']
-            self.test_x = data['test_x']
-            self.test_y = data['test_y']
-            self.test_buckets = data['test_buckets']
+            self.train_x = data["train_x"]
+            self.train_y = data["train_y"]
+            self.train_buckets = data["train_buckets"]
+            self.dev_x = data["dev_x"]
+            self.dev_y = data["dev_y"]
+            self.dev_buckets = data["dev_buckets"]
+            self.test_x = data["test_x"]
+            self.test_y = data["test_y"]
+            self.test_buckets = data["test_buckets"]
 
         self.epoch = 0
-        self.bucket_weights = self.train_buckets[:,1] - self.train_buckets[:,0]
+        self.bucket_weights = self.train_buckets[:, 1] - self.train_buckets[:, 0]
         self.bucket_weights = self.bucket_weights / float(self.bucket_weights.sum())
 
         self.chars_print = self.chars
         try:
-            print(u"Alphabet: {}".format(u"".join(self.chars)))
+            print("Alphabet: {}".format("".join(self.chars)))
         except UnicodeEncodeError:
             self.chars_print = "abcdefghijklmnopqrstuvwxyzaaeeeeiinoouuacelnszz"
             print("Alphabet: " + self.chars_print)
             self.chars_print = list(self.chars_print)
-            print("""
+            print(
+                """
 NOTE: Your terminal does not appear to support printing Unicode characters.
 For the purposes of printing to the terminal, some of the letters in the
-alphabet above have been substituted with ASCII symbols.""".strip())
+alphabet above have been substituted with ASCII symbols.""".strip()
+            )
         print("")
 
         # Select some examples to spotlight in the monitoring phase (3 per language)
@@ -322,28 +341,30 @@ alphabet above have been substituted with ASCII symbols.""".strip())
         max_word_len = self.dev_x.shape[1]
         max_lang_len = max([len(x) for x in self.language_names])
 
-        self.predicted_template = u"Pred: {:<NUM}".replace('NUM',
-            str(max_lang_len))
+        self.predicted_template = "Pred: {:<NUM}".replace("NUM", str(max_lang_len))
 
-        self.word_template = u"  "
-        self.word_template += u"{:<NUM} ".replace('NUM', str(max_word_len))
-        self.word_template += u"{:<NUM} ({:6.1%})".replace('NUM', str(max_lang_len))
-        self.word_template += u" {:<NUM} ".replace('NUM',
-            str(max_lang_len + len('Pred: ')))
+        self.word_template = "  "
+        self.word_template += "{:<NUM} ".replace("NUM", str(max_word_len))
+        self.word_template += "{:<NUM} ({:6.1%})".replace("NUM", str(max_lang_len))
+        self.word_template += " {:<NUM} ".replace(
+            "NUM", str(max_lang_len + len("Pred: "))
+        )
         for i in range(len(self.language_names)):
-            self.word_template += u"|{}".format(self.language_codes[i])
+            self.word_template += "|{}".format(self.language_codes[i])
             self.word_template += "{probs[" + str(i) + "]:4.0%}"
 
         self.last_update = time.time()
 
     def _encode(self, inp_x, inp_y):
+        # print("Encoding data...")
         xs = []
         for i in range(inp_x.shape[1]):
-            if np.all(inp_x[:,i] == -1):
+            if np.all(inp_x[:, i] == -1):
                 break
-            assert not np.any(inp_x[:,i] == -1), (
-                "Please report this error in the project: batching by length was done incorrectly in the provided code")
-            x = np.eye(len(self.chars))[inp_x[:,i]]
+            assert not np.any(
+                inp_x[:, i] == -1
+            ), "Please report this error in the project: batching by length was done incorrectly in the provided code"
+            x = np.eye(len(self.chars))[inp_x[:, i]]
             xs.append(nn.Constant(x))
         y = np.eye(len(self.language_names))[inp_y]
         y = nn.Constant(y)
@@ -353,8 +374,8 @@ alphabet above have been substituted with ASCII symbols.""".strip())
         exp = np.exp(x - np.max(x, axis=-1, keepdims=True))
         return exp / np.sum(exp, axis=-1, keepdims=True)
 
-    def _predict(self, split='dev'):
-        if split == 'dev':
+    def _predict(self, split="dev"):
+        if split == "dev":
             data_x = self.dev_x
             data_y = self.dev_y
             buckets = self.dev_buckets
@@ -380,20 +401,25 @@ alphabet above have been substituted with ASCII symbols.""".strip())
         return all_predicted_probs, all_predicted, all_correct
 
     def iterate_once(self, batch_size):
-        assert isinstance(batch_size, int) and batch_size > 0, (
-            "Batch size should be a positive integer, got {!r}".format(
-                batch_size))
-        assert self.train_x.shape[0] >= batch_size, (
-            "Dataset size {:d} is smaller than the batch size {:d}".format(
-                self.train_x.shape[0], batch_size))
+        assert (
+            isinstance(batch_size, int) and batch_size > 0
+        ), "Batch size should be a positive integer, got {!r}".format(batch_size)
+        assert (
+            self.train_x.shape[0] >= batch_size
+        ), "Dataset size {:d} is smaller than the batch size {:d}".format(
+            self.train_x.shape[0], batch_size
+        )
 
         self.epoch += 1
 
         for iteration in range(self.train_x.shape[0] // batch_size):
-            bucket_id = np.random.choice(self.bucket_weights.shape[0], p=self.bucket_weights)
+            bucket_id = np.random.choice(
+                self.bucket_weights.shape[0], p=self.bucket_weights
+            )
             example_ids = self.train_buckets[bucket_id, 0] + np.random.choice(
                 self.train_buckets[bucket_id, 1] - self.train_buckets[bucket_id, 0],
-                size=batch_size)
+                size=batch_size,
+            )
 
             yield self._encode(self.train_x[example_ids], self.train_y[example_ids])
 
@@ -401,21 +427,31 @@ alphabet above have been substituted with ASCII symbols.""".strip())
                 dev_predicted_probs, dev_predicted, dev_correct = self._predict()
                 dev_accuracy = np.mean(dev_predicted == dev_correct)
 
-                print("epoch {:,} iteration {:,} validation-accuracy {:.1%}".format(
-                    self.epoch, iteration, dev_accuracy))
+                print(
+                    "epoch {:,} iteration {:,} validation-accuracy {:.1%}".format(
+                        self.epoch, iteration, dev_accuracy
+                    )
+                )
 
                 for idx in self.spotlight_idxs:
-                    correct = (dev_predicted[idx] == dev_correct[idx])
-                    word = u"".join([self.chars_print[ch] for ch in self.dev_x[idx] if ch != -1])
+                    correct = dev_predicted[idx] == dev_correct[idx]
+                    word = "".join(
+                        [self.chars_print[ch] for ch in self.dev_x[idx] if ch != -1]
+                    )
 
-                    print(self.word_template.format(
-                        word,
-                        self.language_names[dev_correct[idx]],
-                        dev_predicted_probs[idx, dev_correct[idx]],
-                        "" if correct else self.predicted_template.format(
-                            self.language_names[dev_predicted[idx]]),
-                        probs=dev_predicted_probs[idx,:],
-                    ))
+                    print(
+                        self.word_template.format(
+                            word,
+                            self.language_names[dev_correct[idx]],
+                            dev_predicted_probs[idx, dev_correct[idx]],
+                            ""
+                            if correct
+                            else self.predicted_template.format(
+                                self.language_names[dev_predicted[idx]]
+                            ),
+                            probs=dev_predicted_probs[idx, :],
+                        )
+                    )
 
                 self.last_update = time.time()
 
@@ -427,6 +463,7 @@ alphabet above have been substituted with ASCII symbols.""".strip())
 
 def main():
     import models
+
     model = models.PerceptronModel(3)
     dataset = PerceptronDataset(model)
     model.train(dataset)
@@ -440,8 +477,11 @@ def main():
     model.train(dataset)
 
     model = models.LanguageIDModel()
+    print(model)
     dataset = LanguageIDDataset(model)
+    print(dataset)
     model.train(dataset)
+
 
 if __name__ == "__main__":
     main()
